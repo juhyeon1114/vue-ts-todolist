@@ -1,6 +1,6 @@
 <template>
 	<div class="form-group">
-		<input type="text" class="form-control" @keyup.enter="addItem" placeholder="할일을 입력해주세요" />
+		<input type="text" class="form-control" @keyup.enter="addItem" placeholder="할일을 입력해주세요" v-model="title" />
 	</div>
 </template>
 
@@ -9,8 +9,12 @@ import { Component, Vue } from 'vue-property-decorator';
 
 @Component
 export default class ListItem extends Vue {
+	title!: string;
+
 	addItem() {
-		console.log(1);
+		const id = this.$store.state.todoList.length + 1;
+		this.$store.commit('addItem', { id, title: this.title, status: 'active' });
+		this.title = '';
 	}
 }
 </script>

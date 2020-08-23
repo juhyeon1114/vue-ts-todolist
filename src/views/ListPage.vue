@@ -1,33 +1,49 @@
 <template>
 	<div>
-		<list-item v-for="d in renderList" :key="d.id" :title="d.title" :status="d.status"></list-item>
+		<list-item v-for="d in renderList" :key="d.id" :id="d.id" :title="d.title" :status="d.status"></list-item>
 	</div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import ListItem from '@/components/ListItem.vue';
+// import { mapGetters } from 'vuex';
 
 @Component({
 	components: {
 		ListItem,
 	},
+	computed: {
+		// ...mapGetters(['everyTodoList', 'activeTodoList', 'clearTodoList']),
+		// status: this.$route.params.status,
+	},
 })
 export default class ListPage extends Vue {
-	data = [
-		{ id: 0, title: 'test1', status: 'active' },
-		{ id: 1, title: 'test2', status: 'active' },
-		{ id: 2, title: 'test3', status: 'clear' },
-	];
-	renderList = this.data;
+	renderList = [];
+
+	initRenderList(newVal: string) {
+		if (!newVal) {
+			this.renderList = this.$store.getters.everyTodoList;
+		} else if (newVal === 'active') {
+			this.renderList = this.$store.getters.activeTodoList;
+		} else if (newVal === 'clear') {
+			this.renderList = this.$store.getters.clearTodoList;
+		}
+	}
 
 	@Watch('$route.params.status')
-	routeUpdate(newVal: string) {
-		if (!newVal) {
-			this.renderList = this.data;
-		} else {
-			this.renderList = this.data.filter(v => v.status === newVal);
-		}
+	routeUpdate(newVal: 'active' | 'clear') {
+		this.initRenderList(newVal);
+	}
+
+	@Watch('$store.state.todoList', { deep: true })
+	todoListUpdate() {
+		this.initRenderList(this.$route.params.status);
+	}
+
+	created() {
+		const status = this.$route.params.status;
+		this.initRenderList(status);
 	}
 }
 </script>

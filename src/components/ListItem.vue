@@ -2,7 +2,7 @@
 	<div class="input-group">
 		<div class="input-group-prepend">
 			<div class="input-group-text">
-				<input type="checkbox" :checked="status === 'clear'" @change="changeStatus" />
+				<input type="checkbox" ref="checkbox" :checked="status === 'clear'" @change="changeStatus" />
 			</div>
 		</div>
 		<input type="text" class="form-control" :value="title" />
@@ -21,11 +21,12 @@ export default class ListItem extends Vue {
 	@Prop() readonly title!: string;
 	@Prop() readonly status!: 'active' | 'clear';
 
-	changeStatus() {
-		console.log(1);
+	changeStatus($event: any) {
+		const status = $event.target.checked ? 'clear' : 'active';
+		this.$store.commit('changeStatus', { id: this.id, status });
 	}
 	removeItem() {
-		console.log(1);
+		this.$store.commit('removeItem', this.id);
 	}
 }
 </script>
